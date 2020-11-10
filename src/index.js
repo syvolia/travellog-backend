@@ -20,21 +20,8 @@ mongoose.connect(process.env.DATABASE_URL, {
 
 app.use(morgan('common'));
 app.use(helmet());
-
-var allowedOrigins = ['http://localhost:3000',
-  'https://trusting-pasteur-80b95c.netlify.app/'];
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin 
-    // (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      var msg = 'The CORS policy for this site does not ' +
-        'allow access from the specified Origin.';
-      return res.json({ status: 'error', msg });
-    }
-    return callback(null, true);
-  }
+  origin: process.env.CORS_ORIGIN,
 }));
 app.use(express.json());
 

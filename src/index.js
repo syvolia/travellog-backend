@@ -20,16 +20,22 @@ mongoose.connect(process.env.DATABASE_URL, {
 
 app.use(morgan('common'));
 app.use(helmet());
-// app.use(cors({
-//   origin: process.env.CORS_ORIGIN,
-// }));
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
-  next();
-});
+
+var allowedOrigins = ['http://localhost:3000',
+  'https://trusting-pasteur-80b95c.netlify.app/'];
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin 
+    // (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = 'The CORS policy for this site does not ' +
+        'allow access from the specified Origin.';
+      return res.json({ status: 'error', msg });
+    }
+    return callback(null, true);
+  }
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
